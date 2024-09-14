@@ -246,6 +246,135 @@ class StudentVueClient {
     );
   }
 
+  // Report Card / Document Code
+  Future<List<String>> listReportCards({required Function(double) callback}) async {
+  String requestData = '''<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
+          <userID>$username</userID>
+          <password>$password</password>
+          <skipLoginLog>1</skipLoginLog>
+          <parent>${studentAccount ? '0' : '1'}</parent>
+          <webServiceHandleName>PXPWebServices</webServiceHandleName>
+          <methodName>GetReportCardInitialData</methodName>
+          <paramStr>&lt;Parms&gt;&lt;/Parms&gt;</paramStr>
+        </ProcessWebServiceRequest>
+      </soap:Body>
+    </soap:Envelope>''';
+
+  var headers = {'Content-Type': 'text/xml'};
+  var res = await _dio.post(reqURL, data: requestData, options: Options(headers: headers));
+  var resData = res.data;
+
+  // Log the full raw response to see what's being returned
+  print('Report Cards Response: $resData');
+
+  // Parse XML response
+  final document = XmlDocument.parse(HtmlUnescape().convert(resData));
+  var reportCards = <String>[];
+
+  // Loop through each <ReportCard> element and extract relevant data
+  var reportCardElements = document.findAllElements('ReportCard');
+  for (var reportCard in reportCardElements) {
+    var documentGUID = reportCard.getAttribute('DocumentGUID') ?? '';
+    reportCards.add(documentGUID); // Add GUID to the list
+  }
+
+  return reportCards;
+}
+
+Future<String> getReportCard(String documentGUID) async {
+  String requestData = '''<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
+          <userID>$username</userID>
+          <password>$password</password>
+          <skipLoginLog>1</skipLoginLog>
+          <parent>${studentAccount ? '0' : '1'}</parent>
+          <webServiceHandleName>PXPWebServices</webServiceHandleName>
+          <methodName>GetReportCardDocumentData</methodName>
+          <paramStr>&lt;Parms&gt;&lt;DocumentGU&gt;$documentGUID&lt;/DocumentGU&gt;&lt;/Parms&gt;</paramStr>
+        </ProcessWebServiceRequest>
+      </soap:Body>
+    </soap:Envelope>''';
+
+  var headers = {'Content-Type': 'text/xml'};
+  var res = await _dio.post(reqURL, data: requestData, options: Options(headers: headers));
+  var resData = res.data;
+
+  // Parse XML response and extract report card data (likely in a <Document> element)
+  final document = XmlDocument.parse(HtmlUnescape().convert(resData));
+  var reportCardContent = document.rootElement.innerText; // Assuming it's in the root or a specific element
+  return reportCardContent;
+}
+
+Future<List<String>> listDocuments() async {
+  String requestData = '''<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
+          <userID>$username</userID>
+          <password>$password</password>
+          <skipLoginLog>1</skipLoginLog>
+          <parent>${studentAccount ? '0' : '1'}</parent>
+          <webServiceHandleName>PXPWebServices</webServiceHandleName>
+          <methodName>GetStudentDocumentInitialData</methodName>
+          <paramStr>&lt;Parms&gt;&lt;/Parms&gt;</paramStr>
+        </ProcessWebServiceRequest>
+      </soap:Body>
+    </soap:Envelope>''';
+
+  var headers = {'Content-Type': 'text/xml'};
+  var res = await _dio.post(reqURL, data: requestData, options: Options(headers: headers));
+  var resData = res.data;
+
+  // First, unescape the content inside <ProcessWebServiceRequestResult>
+  final document = XmlDocument.parse(resData);
+  var result = document.findAllElements('ProcessWebServiceRequestResult').first.text;
+  var unescapedResult = HtmlUnescape().convert(result);
+
+  // Now, parse the unescaped result as XML
+  final unescapedDocument = XmlDocument.parse(unescapedResult);
+  var documents = <String>[];
+
+  // Loop through <StudentDocumentData> elements and extract DocumentGU
+  var documentElements = unescapedDocument.findAllElements('StudentDocumentData');
+  for (var doc in documentElements) {
+    var documentGUID = doc.getAttribute('DocumentGU') ?? '';
+    documents.add(documentGUID); // Add GUID to list
+  }
+
+  return documents;
+}
+
+Future<String> getDocument(String documentGUID) async {
+  String requestData = '''<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
+          <userID>$username</userID>
+          <password>$password</password>
+          <skipLoginLog>1</skipLoginLog>
+          <parent>${studentAccount ? '0' : '1'}</parent>
+          <webServiceHandleName>PXPWebServices</webServiceHandleName>
+          <methodName>GetContentOfAttachedDoc</methodName>
+          <paramStr>&lt;Parms&gt;&lt;DocumentGU&gt;$documentGUID&lt;/DocumentGU&gt;&lt;/Parms&gt;</paramStr>
+        </ProcessWebServiceRequest>
+      </soap:Body>
+    </soap:Envelope>''';
+
+  var headers = {'Content-Type': 'text/xml'};
+  var res = await _dio.post(reqURL, data: requestData, options: Options(headers: headers));
+  var resData = res.data;
+
+  // Parse XML response and extract document content
+  final document = XmlDocument.parse(HtmlUnescape().convert(resData));
+  var documentContent = document.rootElement.innerText; // Extract the actual content of the document
+  return documentContent;
+}
+
   static Future<List<ZipCodeResult>> loadDistrictsFromZip(String zip,
       {required Function(double) callback, bool mock = false}) async {
     String resData;
