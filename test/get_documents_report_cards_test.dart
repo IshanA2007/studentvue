@@ -10,7 +10,8 @@ void saveDocumentAsPdf(String documentContent, String documentGUID) async {
   List<int> decodedBytes = base64.decode(documentContent);
 
   // Create a file to save the PDF
-  String filePath = './$documentGUID.pdf';  // Save the file with the document GUID as the name
+  String filePath =
+      './$documentGUID.pdf'; // Save the file with the document GUID as the name
   File pdfFile = File(filePath);
 
   // Write the decoded bytes to the PDF file
@@ -18,10 +19,11 @@ void saveDocumentAsPdf(String documentContent, String documentGUID) async {
 
   print('PDF saved to: $filePath');
 }
+
 void main() async {
   // Replace with real credentials for actual testing
-  String username = "username";
-  String password = "password";
+  String username = "1620426";
+  String password = "";
   String domain = 'sisstudent.fcps.edu';
 
   // Initialize the StudentVueClient
@@ -29,16 +31,21 @@ void main() async {
 
   // Test listDocuments
   print('Fetching student documents...');
-  var documents = await client.listDocuments();
-  print('Documents: $documents');
+  var documents = await client.loadGradebook(
+      reportPeriod: 1,
+      callback: (progress) {
+        print('Progress: $progress');
+      });
 
-  // Test getDocument (assuming a valid document GUID)
-  if (documents.isNotEmpty) {
-    documents.forEach((documentGUID) async {
-      print('Fetching document content for GUID: $documentGUID...');
-      var documentContent = await client.getDocument(documentGUID);
-      documentContent = documentContent.trim(); // Trim any whitespace
-      saveDocumentAsPdf(documentContent, documentGUID);
-    });
-  }
+  print(documents);
+  var documents2 = await client.loadGradebook(callback: (progress) {
+    print('Progress: $progress');
+  });
+  print(documents2);
+
+  var absences = await client.getAbsences(callback: (progress) {
+    print('Progress: $progress');
+  });
+
+  print(absences);
 }
