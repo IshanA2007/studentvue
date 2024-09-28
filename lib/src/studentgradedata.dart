@@ -67,11 +67,36 @@ class Assignment {
     this.possiblePoints = 0.0,
   });
 
+  // Convert Assignment object to a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'assignmentName': assignmentName,
+      'date': date,
+      'category': category,
+      'notes': notes,
+      'earnedPoints': earnedPoints,
+      'possiblePoints': possiblePoints,
+    };
+  }
+
+  // Convert Map to an Assignment object
+  factory Assignment.fromMap(Map<String, dynamic> map) {
+    return Assignment(
+      assignmentName: map['assignmentName'] ?? '',
+      date: map['date'] ?? '',
+      category: map['category'] ?? '',
+      notes: map['notes'] ?? '',
+      earnedPoints: (map['earnedPoints'] ?? 0.0).toDouble(),
+      possiblePoints: (map['possiblePoints'] ?? 0.0).toDouble(),
+    );
+  }
+
   @override
   String toString() {
     return 'Assignment{assignmentName: $assignmentName, date: $date, category: $category, earnedPoints: $earnedPoints, possiblePoints: $possiblePoints, notes: $notes}';
   }
 }
+
 
 class AssignmentCategory {
   double earnedPoints;
