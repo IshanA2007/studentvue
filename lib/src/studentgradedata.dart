@@ -97,7 +97,6 @@ class Assignment {
   }
 }
 
-
 class AssignmentCategory {
   double earnedPoints;
   double possiblePoints;
@@ -110,6 +109,26 @@ class AssignmentCategory {
     this.possiblePoints = 0.0,
     this.weight = 0.0,
   });
+
+  // Convert AssignmentCategory object to a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'earnedPoints': earnedPoints,
+      'possiblePoints': possiblePoints,
+      'weight': weight,
+      'name': name,
+    };
+  }
+
+  // Convert Map to an AssignmentCategory object
+  factory AssignmentCategory.fromMap(Map<String, dynamic> map) {
+    return AssignmentCategory(
+      earnedPoints: map['earnedPoints'] ?? 0.0,
+      possiblePoints: map['possiblePoints'] ?? 0.0,
+      weight: map['weight'] ?? 0.0,
+      name: map['name'],
+    );
+  }
 
   @override
   String toString() {
