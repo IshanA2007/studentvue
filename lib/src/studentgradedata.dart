@@ -67,6 +67,29 @@ class Assignment {
     this.possiblePoints = 0.0,
   });
 
+  // Override == operator for comparison based on attributes
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Assignment) return false;
+    return assignmentName == other.assignmentName &&
+        date == other.date &&
+        category == other.category &&
+        notes == other.notes &&
+        earnedPoints == other.earnedPoints &&
+        possiblePoints == other.possiblePoints;
+  }
+
+  // Override hashCode for consistent equality checks
+  @override
+  int get hashCode =>
+      assignmentName.hashCode ^
+      date.hashCode ^
+      category.hashCode ^
+      notes.hashCode ^
+      earnedPoints.hashCode ^
+      possiblePoints.hashCode;
+
   // Convert Assignment object to a Map
   Map<String, dynamic> toMap() {
     return {
