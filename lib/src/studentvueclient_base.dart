@@ -139,9 +139,21 @@ class StudentVueClient {
       return StudentGradeData()
         ..error = 'The user name or password is incorrect';
     }
-    // var currentMP = document.findAllElements('ReportingPeriod').first.getAttribute('GradePeriod');
+    var currentMP = document
+        .findAllElements('ReportingPeriod')
+        .first
+        .getAttribute('GradePeriod');
 
+    var report_periods = document.findAllElements("ReportPeriod");
+    // loop through report periods, find the one where it's GradePeriod = currentMP, get its Index, then index+1
+    var quarter = -1;
+    report_periods.forEach((rep_period) {
+      if (rep_period.getAttribute("GradePeriod") == currentMP) {
+        quarter = int.parse(rep_period.getAttribute('Index') ?? "-3") + 1;
+      }
+    });
     var svData = StudentGradeData();
+    svData.quarter = quarter;
 
     var courses = document.findAllElements('Courses').first;
     var classes = <SchoolClass>[];
@@ -337,7 +349,7 @@ class StudentVueClient {
     var resData = res.data;
 
     // Log the full raw response to see what's being returned
-    print('Report Cards Response: $resData');
+
 
     // Parse XML response
     final document = XmlDocument.parse(HtmlUnescape().convert(resData));

@@ -1,17 +1,19 @@
 class StudentGradeData {
   List<SchoolClass> classes;
   String studentName;
+  int quarter;
   String error;
 
   StudentGradeData({
     this.classes = const [],
     this.studentName = '',
     this.error = '',
+    this.quarter = -1,
   });
 
   @override
   String toString() {
-    return 'StudentGradeData{classes: $classes, studentName: $studentName, error: $error}';
+    return 'StudentGradeData{quarter: $quarter, classes: $classes, studentName: $studentName, error: $error}';
   }
 }
 

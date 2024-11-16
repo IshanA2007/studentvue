@@ -31,11 +31,9 @@ void main() async {
 
   // Test listDocuments
   print('Fetching student documents...');
-  var documents = await client.loadGradebook(
-      reportPeriod: 1,
-      callback: (progress) {
-        print('Progress: $progress');
-      });
+  var documents = await client.loadGradebook(callback: (progress) {
+    print('Progress: $progress');
+  });
 
   print(documents);
   var documents2 = await client.loadGradebook(callback: (progress) {
