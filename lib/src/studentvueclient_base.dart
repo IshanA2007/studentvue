@@ -184,9 +184,9 @@ class StudentVueClient {
       for (var i = 0; i < current.children.length; i++) {
         if (current.children[i].getAttribute('Type') == 'TOTAL') {
           _class.earnedPoints = double.tryParse(
-              current.children[i].getAttribute('Points') ?? '')!;
+              current.children[i].getAttribute('Points')?.replaceAll(",", "") ?? '')!;
           _class.earnedPoints = double.tryParse(
-              current.children[i].getAttribute('PointsPossible') ?? '')!;
+              current.children[i].getAttribute('PointsPossible')?.replaceAll(",", "") ?? '')!;
           _class.pctGrade ??= current.children[i]
               .getAttribute('WeightedPct'); // replace only if it's already null
         } // else {
@@ -197,10 +197,10 @@ class StudentVueClient {
                     .replaceAll('%', '')) ??
             0.0;
         category.earnedPoints =
-            double.tryParse(current.children[i].getAttribute('Points') ?? '') ??
+            double.tryParse(current.children[i].getAttribute('Points')?.replaceAll(",", "") ?? '') ??
                 0.0;
         category.possiblePoints = double.tryParse(
-                current.children[i].getAttribute('PointsPossible') ?? '') ??
+                current.children[i].getAttribute('PointsPossible')?.replaceAll(",", "") ?? '') ??
             0.0;
         _class.assignmentCategories.add(category);
 //          debugPrint('added category for class ${_class.className} : ${category}');
